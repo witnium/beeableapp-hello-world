@@ -27,7 +27,7 @@ scripts/         ← Build scripts (OpenAPI generator). Don't modify unless aske
 | `beeable.llm.chat()`         | network error   | yes        |
 | `server/routes.js`           | does not run    | yes        |
 
-The SDK lives in the `@witnium/beeable-sdk/app-runtime` npm package and auto-detects which environment it's in. Same code works in both. **Don't add `if (preview) ... else ...` branches** — the SDK already does that under the hood. Just call the methods normally and let preview-only failures surface as errors.
+The SDK lives in the `@beeable/sdk/app-runtime` npm package and auto-detects which environment it's in. Same code works in both. **Don't add `if (preview) ... else ...` branches** — the SDK already does that under the hood. Just call the methods normally and let preview-only failures surface as errors.
 
 ## Decision tree: where does this feature go?
 
@@ -67,7 +67,7 @@ In Lovable's preview the URL is just `/`, which falls through to fullscreen mode
 The Beeable host paints chrome above the app iframe — the app itself cannot render there. To put items in that bar the app declares them via a `postMessage` through the SDK:
 
 ```js
-import { ready, declareMenu, onMenuAction } from '@witnium/beeable-sdk/app-runtime';
+import { ready, declareMenu, onMenuAction } from '@beeable/sdk/app-runtime';
 
 ready();
 declareMenu([
@@ -145,11 +145,11 @@ server/routes.js               openapi.json                  typed TS client
 `scripts/generate-openapi.mjs` reads `server/routes.js`, extracts every `@openapi` JSDoc block, parses the YAML body, and writes `openapi.json`. Triggered by `npm run build:api`. The deploy pipeline runs it automatically. The orchestrator reads `openapi.json` to turn each `operationId` into a callable tool.
 
 **2. `openapi.json` → typed TypeScript client (runs on the platform)**
-The Beeable platform exposes `GET /api/apps/discover/{appPath}/sdk` which returns a single-file TypeScript SDK generated from the app's OpenAPI spec — type aliases for every schema, a typed async function per operation, and a React Query hook per operation. Other apps (or external consumers) fetch this via `fetchAppSdk` from `@witnium/beeable-sdk/apps`:
+The Beeable platform exposes `GET /api/apps/discover/{appPath}/sdk` which returns a single-file TypeScript SDK generated from the app's OpenAPI spec — type aliases for every schema, a typed async function per operation, and a React Query hook per operation. Other apps (or external consumers) fetch this via `fetchAppSdk` from `@beeable/sdk/apps`:
 
 ```ts
 // In another app, or an external Node consumer
-import { fetchAppSdk } from '@witnium/beeable-sdk/apps';
+import { fetchAppSdk } from '@beeable/sdk/apps';
 
 await fetchAppSdk({
   baseUrl: 'https://api.beeable.dev/api',
@@ -185,13 +185,13 @@ You may NOT use:
 - npm packages other than `express`. Do not add `axios`, `node-fetch`, `nodemailer`, `pg`, `mysql2`, anything else. If you think you need one, you're solving the wrong problem in the wrong place — go back to the decision tree and try step 4 (call another Beeable app) or step 3 (use `req.beeableApi`).
 - `import` from `../src/...`. The two halves of the repo never reference each other.
 
-## The in-app SDK (`@witnium/beeable-sdk/app-runtime`)
+## The in-app SDK (`@beeable/sdk/app-runtime`)
 
 The SDK is pre-installed and auto-detects preview vs production. Import only what you need. Every export falls into one of three groups:
 
 **Host bridge (postMessage to the Beeable shell)**
 ```js
-import { ready, declareMenu, clearMenu, onMenuAction, requestSelect } from '@witnium/beeable-sdk/app-runtime';
+import { ready, declareMenu, clearMenu, onMenuAction, requestSelect } from '@beeable/sdk/app-runtime';
 
 ready();                                             // tell the host the app has booted
 declareMenu([{ id: 'file', label: 'File', children: [{ id: 'new', label: 'New' }] }]);
@@ -204,7 +204,7 @@ All of these are silent no-ops in the Lovable preview (no parent host). Call the
 
 **Live data signals**
 ```js
-import { onDataChanged } from '@witnium/beeable-sdk/app-runtime';
+import { onDataChanged } from '@beeable/sdk/app-runtime';
 
 const unsub = onDataChanged(() => refetch()); // SSE in production, no-op in preview
 ```
@@ -213,7 +213,7 @@ Use after any mutation so window + fullscreen views stay consistent. The server 
 
 **Platform + cross-app + LLM**
 ```js
-import { beeable, appId, basePath } from '@witnium/beeable-sdk/app-runtime';
+import { beeable, appId, basePath } from '@beeable/sdk/app-runtime';
 
 // Platform API (runs as the current user)
 await beeable.api.get('/memories');
@@ -265,7 +265,7 @@ In the Lovable preview these all reject with a network error (there's no platfor
 - Never add server-only npm packages (`postmark`, `nodemailer`, `axios`, `pg`, `redis`, `aws-sdk`, …) to `package.json`. The runtime provides everything you need via `req.beeableApi`.
 - Never add component libraries (`shadcn`, `mui`, `mantine`, `chakra`, `radix-ui`, …) to `package.json`. Tailwind only.
 - Never put secrets, API keys, tokens, env vars, or connection strings in this repo. Credentials live in the Beeable platform and arrive via `req.beeableApi`. If you find yourself needing one, you're missing a Beeable integration — say so to the user instead of hardcoding.
-- Never bump `@witnium/beeable-sdk` to a pinned version — leave it at `"latest"`. The Beeable runtime overrides the SDK at request time with its own canonical version anyway, but `latest` keeps the Lovable preview using the freshest published copy with no maintenance.
+- Never bump `@beeable/sdk` to a pinned version — leave it at `"latest"`. The Beeable runtime overrides the SDK at request time with its own canonical version anyway, but `latest` keeps the Lovable preview using the freshest published copy with no maintenance.
 - Never remove the `WindowView` or `FullscreenView` files. Both modes must always render something sensible.
 
 ## When you complete a task

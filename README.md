@@ -69,7 +69,7 @@ Every Beeable app renders in two modes, both served from the same `index.html`:
 The host renders its own chrome above the iframe. The app can't paint there directly, so menus travel over `postMessage`:
 
 ```js
-import { ready, declareMenu, onMenuAction } from '@witnium/beeable-sdk/app-runtime';
+import { ready, declareMenu, onMenuAction } from '@beeable/sdk/app-runtime';
 
 ready();
 declareMenu([

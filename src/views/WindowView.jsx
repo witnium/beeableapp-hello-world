@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { greetings } from '../data.js';
-import { onDataChanged } from '@witnium/beeable-sdk/app-runtime';
+import { onDataChanged } from '@beeable/sdk/app-runtime';
 
 // ── Window mode ────────────────────────────────────────────────────
 //

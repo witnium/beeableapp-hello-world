@@ -10,7 +10,7 @@
     "build:api": "node scripts/generate-openapi.mjs"
   },
   "dependencies": {
-    "@witnium/beeable-sdk": "latest",
+    "@beeable/sdk": "latest",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

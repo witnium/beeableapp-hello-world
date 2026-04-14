@@ -7,7 +7,7 @@ import {
   onDataChanged,
   onMenuAction,
   ready,
-} from '@witnium/beeable-sdk/app-runtime';
+} from '@beeable/sdk/app-runtime';
 
 // ── Fullscreen mode ────────────────────────────────────────────────
 //
