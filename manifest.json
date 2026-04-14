@@ -1,0 +1,10 @@
+{
+  "name": "hello-world",
+  "displayName": "Hello World",
+  "hasApi": true,
+  "hasUi": true,
+  "databases": {
+    "default": "hello-world/hello-world"
+  },
+  "collections": ["greetings"]
+}

@@ -1,0 +1,151 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hello World API",
+    "description": "HTTP API exposed by the Hello World Beeable app. Endpoints are extracted from JSDoc @openapi blocks in server/routes.js — every public operation is declared explicitly.",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/greetings": {
+      "get": {
+        "operationId": "list_greetings",
+        "summary": "List all greetings, newest first",
+        "tags": [
+          "greetings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of greetings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "name",
+                      "message",
+                      "created_at"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "create_greeting",
+        "summary": "Record a greeting for someone",
+        "tags": [
+          "greetings"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Who to greet."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The stored greeting"
+          },
+          "400": {
+            "description": "name missing"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "clear_greetings",
+        "summary": "Remove every stored greeting",
+        "tags": [
+          "greetings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Count of greetings removed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "removed": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hello/{name}": {
+      "get": {
+        "operationId": "say_hello",
+        "summary": "Stateless greeting — does not persist anything",
+        "description": "Returns a friendly greeting for `name` without writing to the\ncollection. Useful as a simple example of a custom route that\nisn't backed by stored state.\n",
+        "tags": [
+          "greetings"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A greeting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
